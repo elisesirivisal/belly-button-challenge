@@ -25,9 +25,8 @@ function init() {
     });
 }
 
-// Call updateCharts() when a change takes place to the DOM, updates charts
+// Call updateCharts() when a new Subject ID is chosen, updates charts and data
 d3.selectAll("#selDataset").on("change", function () {
-    // Use the value of the selected option
     var selectedSample = d3.select(this).property("value");
     updateCharts(selectedSample);
     updateMetaData(selectedSample);
@@ -41,7 +40,7 @@ var metadataDiv = d3.select("#sample-metadata");
 // Function to create the bar chart based on the selected sample
 function updateCharts(selectedSample) {
     // Find sample
-    var sampleData = data.samples.find(sample => sample.id === selectedSample);
+    var sampleData = data.samples.find(data => data.id === selectedSample);
 
     // (2) Create Bar Chart
     // Grab top 10 OTU for selected sample
@@ -98,7 +97,7 @@ function updateCharts(selectedSample) {
 // (4) Updates sample metadata (individual's demographic info)
 function updateMetaData(selectedSample){
     // convert number as string to number format, grab metadata
-    var metadata = data.metadata.find(meta => meta.id === parseInt(selectedSample));
+    var metadata = data.metadata.find(data => data.id === parseInt(selectedSample));
 
     // Initialize as empty
     metadataDiv.html("");
