@@ -1,13 +1,13 @@
-let data;
-
+// Initialize page with data/info from first sample
 function init() {
-    const samples = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json";
+    // (1) Use the D3 library to read in samples.json from the sollowing URL
+    let url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json";
 
     // Get reference: dropdown menu
     let dropdownMenu = d3.select("#selDataset");
 
     // Use the list of sample names to populate the select options
-    d3.json(samples).then(jsonData => {
+    d3.json(url).then(jsonData => {
         data = jsonData; // Assign the data to the global variable
 
         let sampleNames = data.names;
@@ -20,8 +20,8 @@ function init() {
         });
 
         // Use the first sample from the list to build the initial plots
-        let initialSample = sampleNames[0];
-        updateCharts(initialSample);
+        updateCharts(sampleNames[0]);
+        updateMetaData(sampleNames[0]);
     });
 }
 
@@ -30,17 +30,20 @@ d3.selectAll("#selDataset").on("change", function () {
     // Use the value of the selected option
     var selectedSample = d3.select(this).property("value");
     updateCharts(selectedSample);
+    updateMetaData(selectedSample);
 });
 
-var barChartDiv = d3.select("#bar");
-var bubbleChartDiv = d3.select("#bubble");
+// Select Bar Graph, Bubble Graph, and Demographic Info Box
+let barDiv = d3.select("#bar");
+let bubbleDiv = d3.select("#bubble");
+var metadataDiv = d3.select("#sample-metadata");
 
 // Function to create the bar chart based on the selected sample
 function updateCharts(selectedSample) {
     // Find sample
     var sampleData = data.samples.find(sample => sample.id === selectedSample);
 
-    // (1) Create Bar Chart
+    // (2) Create Bar Chart
     // Grab top 10 OTU for selected sample
     var top10OTU = sampleData.sample_values.slice(0, 10).reverse();
     var top10OTUid = sampleData.otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse();
@@ -56,13 +59,9 @@ function updateCharts(selectedSample) {
 
     var barData = [barTrace];
 
-    var barLayout = {
-        title: `Top 10 OTUs for Sample ${selectedSample}`
-    };
+    Plotly.newPlot(barDiv.node(), barData, {});
 
-    Plotly.newPlot(barChartDiv.node(), barData, barLayout);
-
-    // (2) Create Bubble Chart
+    // (3) Create Bubble Chart
     // Use otu_ids for the x values & sample_values for the y values
     var xVals = sampleData.otu_ids;
     var yVals = sampleData.sample_values;
@@ -90,12 +89,24 @@ function updateCharts(selectedSample) {
     var dotData = [dotTrace];
 
     var dotLayout = {
-        title: `Bubble Chart for Sample ${selectedSample}`,
-        xaxis: { title: "OTU IDs" },
-        yaxis: { title: "Sample Values" }
+        xaxis: { title: "OTU ID" }
     };
 
-    Plotly.newPlot(bubbleChartDiv.node(), dotData, dotLayout);
+    Plotly.newPlot(bubbleDiv.node(), dotData, dotLayout);
+}
+
+// (4) Updates sample metadata (individual's demographic info)
+function updateMetaData(selectedSample){
+    // convert number as string to number format, grab metadata
+    var metadata = data.metadata.find(meta => meta.id === parseInt(selectedSample));
+
+    // Initialize as empty
+    metadataDiv.html("");
+
+    // Getting info
+    Object.entries(metadata).forEach(([x, info]) => {
+        metadataDiv.append("p").text(`${x}: ${info}`);
+    });
 }
 
 // Initialize Page
