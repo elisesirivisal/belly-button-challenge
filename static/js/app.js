@@ -60,23 +60,22 @@ function updateCharts(selectedSample) {
         title: `Top 10 OTUs for Sample ${selectedSample}`
     };
 
-    // Use Plotly to create the bar chart
     Plotly.newPlot(barChartDiv.node(), barData, barLayout);
 
     // (2) Create Bubble Chart
+    // Use otu_ids for the x values & sample_values for the y values
     var xVals = sampleData.otu_ids;
-
-    // Use sample_values for y values and marker size
     var yVals = sampleData.sample_values;
+
+    // Use sample_values for the marker size
     var size = sampleData.sample_values;
 
-    // Use otu_ids for marker colors
+    // Use otu_ids for the marker colors
     var color = sampleData.otu_ids;
 
-    // Use otu_labels for text values
+    // Use otu_labels for the text values
     var textVals = sampleData.otu_labels;
 
-    // Create the trace for the bubble chart
     var dotTrace = {
         x: xVals,
         y: yVals,
@@ -88,17 +87,14 @@ function updateCharts(selectedSample) {
         }
     };
 
-    // Create the data array
     var dotData = [dotTrace];
 
-    // Layout for the bubble chart
     var dotLayout = {
         title: `Bubble Chart for Sample ${selectedSample}`,
         xaxis: { title: "OTU IDs" },
         yaxis: { title: "Sample Values" }
     };
 
-    // Use Plotly to create the bubble chart
     Plotly.newPlot(bubbleChartDiv.node(), dotData, dotLayout);
 }
 
